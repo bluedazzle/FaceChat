@@ -1,0 +1,88 @@
+{% extends 'admin/admin_base.html' %}
+{% block content %}
+    <div class="boloContainer" id="vChat">
+        <div class="ui breadcrumb">
+            <a class="section">选手</a>
+            <i class="right angle icon divider"></i>
+        </div>
+        <div class="ui divider"></div>
+
+        <table class="ui celled selectable table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>时间</th>
+                <th>参与者1</th>
+                <th>参与者2</th>
+                <th>活跃</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div v-show="noData" class="ui active inverted dimmer">
+                <div class="ui text loader">Loading</div>
+            </div>
+            <tr v-for="chat in chats">
+                <td>
+                    ${ chat.uuid }}
+                </td>
+                <td>
+                    ${ chat.create_time }}
+                </td>
+                <td><a class="ui image header" href="/admin/user/${ chat.creater.id }}">
+                    <img src="${ chat.creater.avatar }}" class="ui mini rounded image">
+                    <div class="content">${ chat.creater.,nick }}
+                        <div class="sub header">${ chat.creater.phone }}</div>
+                    </div>
+                </a></td>
+                <td><a class="ui image header" href="/admin/user/${ chat.receiver.id }}">
+                    <img src="${ chat.receiver.avatar }}" class="ui mini rounded image">
+                    <div class="content">${ chat.receiver.,nick }}
+                        <div class="sub header">${ chat.receiver.phone }}</div>
+                    </div>
+                </a></td>
+                <td v-show="chat.chat" style="color: red;">
+                    聊天中
+                </td>
+                <td v-else="chat.chat" style="color: green;">
+                    已结束
+                </td>
+                <td>
+                    <a v-show="chat.chat" class="ui red button" href="/admin/peep?channel=${ chat.uuid }}" target="_blank">偷窥</a>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="6">
+                    <div class="ui action left icon input">
+                        <i class="search icon"></i>
+                        <input type="text" v-model="query" placeholder="搜索选手...">
+                        <button class="ui green button" @click="getData(1)">搜索</button>
+                    </div>
+                    <div class="ui right floated pagination menu">
+                        <a class="icon item" :class="{'disabled': pageObj.previous == undefined}"
+                           @click="getData(pageObj.previous)">
+                            <i class="left chevron icon"></i>
+                        </a>
+                        <a class="item" v-for="page in pageObj.page_range"
+                           :class="{'active': page.page == pageObj.current}" @click="getData(page.page)">${
+                            page.page }}
+                            <a class="icon item" :class="{'disabled': pageObj.next == undefined}"
+                               @click="getData(pageObj.next)">
+                                <i class="right chevron icon"></i>
+                            </a>
+                    </div>
+                </th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="/s/js/src/player.js"></script>
+    <script src="/s/js/socket.io.js"></script>
+    <script src="/s/js/adapter.js"></script>
+    <script src="//rtcsdk.agora.io/AgoraRTCSDK-1.2.0.js"></script>
+    <script type="text/javascript" src="/s/js/client.js"></script>
+{% endblock %}
