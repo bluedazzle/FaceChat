@@ -20,4 +20,6 @@ urlpatterns = patterns('',
                        url(r'^leave', LeaveRoomView.as_view()),
                        url(r'^status', RoomStatusView.as_view()),
                        url(r'^open', OpenTimeView.as_view()),
+                       url(r'^number', MatchNumberView.as_view()),
+                       url(r'^modify', ModifyInfoView.as_view()),
                        )

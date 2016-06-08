@@ -591,6 +591,46 @@ class OpenTimeView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMixin, Detai
         return self.render_to_response({'open': open,
                                         'detail': open_time})
 
+
+class MatchNumberView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
+    http_method_names = ['get']
+
+    def get(self, request, *args, **kwargs):
+        if not self.wrap_check_sign_result():
+            return self.render_to_response(dict())
+        if not self.wrap_check_token_result():
+            return self.render_to_response(dict())
+        number = ChatHistory.objects.all().count()
+        return self.render_to_response({'number': number})
+
+
+class ModifyInfoView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+        if not self.wrap_check_sign_result():
+            return self.render_to_response(dict())
+        if not self.wrap_check_token_result():
+            return self.render_to_response(dict())
+        sex = request.POST.get('sex')
+        nick = request.POST.get('nick')
+        if sex and nick:
+            user = FaceUser.objects.filter(nick=nick)
+            if user.exists():
+                user = user[0]
+                if user != self.user:
+                    self.message = '昵称已存在'
+                    self.status_code = INFO_EXISTED
+                    return self.render_to_response({})
+            self.user.sex = sex
+            self.user.nick = nick
+            self.user.save()
+            return self.render_to_response({})
+        self.message = '信息缺失'
+        self.status_code = ERROR_DATA
+        return self.render_to_response({})
+
+
 # class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
 #     http_method_names = ['post']
 #     model = FeedBack
