@@ -96,7 +96,8 @@ class UserRegisterView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMixin, C
     http_method_names = ['post']
     success_url = 'localhost'
     datetime_type = 'timestamp'
-    include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind', 'qq_bind']
+    include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind', 'qq_bind',
+                    'sex']
     count = 64
     token = ''
 
@@ -143,7 +144,8 @@ class UserThirdRegisterView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMix
     http_method_names = ['post']
     success_url = 'localhost'
     datetime_type = 'timestamp'
-    include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind', 'qq_bind']
+    include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind', 'qq_bind',
+                    'sex']
     count = 64
 
     def form_valid(self, form):
@@ -250,7 +252,7 @@ class UserLoginView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMixin, Upda
     pk_url_kwarg = 'phone'
     datetime_type = 'timestamp'
     include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind',
-                    'qq_bind']
+                    'qq_bind', 'sex']
     success_url = 'localhost'
     token = ''
 
@@ -384,7 +386,7 @@ class UserThirdAccountBindView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMi
 class UserThirdLoginView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
     http_method_names = ['get']
     include_attr = ['token', 'id', 'create_time', 'nick', 'phone', 'avatar', 'wechat_bind', 'weibo_bind',
-                    'qq_bind']
+                    'qq_bind', 'sex']
     datetime_type = 'timestamp'
     model = FaceUser
     count = 64
@@ -629,7 +631,6 @@ class ModifyInfoView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonR
         self.message = '信息缺失'
         self.status_code = ERROR_DATA
         return self.render_to_response({})
-
 
 # class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
 #     http_method_names = ['post']
