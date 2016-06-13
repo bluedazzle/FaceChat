@@ -9,7 +9,7 @@ import datetime
 
 from django.db.models import Q
 from django.utils.timezone import get_current_timezone
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, TemplateView
 
 from core.Mixin.CheckMixin import CheckSecurityMixin, CheckTokenMixin
 from core.Mixin.StatusWrapMixin import *
@@ -629,6 +629,11 @@ class ModifyInfoView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonR
         self.message = '信息缺失'
         self.status_code = ERROR_DATA
         return self.render_to_response({})
+
+
+class PortocolView(TemplateView):
+    http_method_names = ['get']
+    template_name = 'protocol.html'
 
 # class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
 #     http_method_names = ['post']
