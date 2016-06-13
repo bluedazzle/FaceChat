@@ -460,10 +460,8 @@ class MatchView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonRespon
             return self.render_to_response(dict())
         wish = int(request.GET.get('wish'))
         match_list = Match.objects.exclude(user=self.user)
-        print match_list
         if wish != 2:
             match_list = match_list.filter(sex=wish)
-        print match_list
         match_list = match_list.filter(Q(wish=self.user.sex) | Q(wish=2))
         if match_list.exists():
             index = random.randint(0, (match_list.count() - 1))
