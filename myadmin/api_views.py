@@ -158,12 +158,19 @@ class AdminUserForbidView(CheckSecurityMixin, CheckAdminPermissionMixin,
     http_method_names = ['post']
     model = FaceUser
     pk_url_kwarg = 'uid'
+    count = 64
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.forbid = not self.object.forbid
+        self.object.token = self.create_token()
         self.object.save()
         return self.render_to_response(dict())
+
+    def create_token(self):
+        return string.join(
+            random.sample('ZYXWVUTSRQPONMLKJIHGFEDCBA1234567890zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba',
+                          self.count)).replace(" ", "")
 
 
 class AdminUserDetailView(CheckSecurityMixin, CheckAdminPermissionMixin,
@@ -196,3 +203,36 @@ class AdminChatHistoryView(CheckSecurityMixin, CheckAdminPermissionMixin,
                 Q(creater__nick__icontains=query_str) | Q(creater__phone__icontains=query_str) | Q(
                     receiver__nick__icontains=query_str) | Q(receiver__phone__icontains=query_str))
         return queryset
+
+
+class ReportListView(CheckSecurityMixin, CheckAdminPermissionMixin,
+                     StatusWrapMixin, MultipleJsonResponseMixin, ListView):
+    http_method_names = ['get']
+    model = Report
+    paginate_by = 20
+    foreign = True
+    exclude_attr = ['token', 'password']
+
+    def get_queryset(self):
+        queryset = super(ReportListView, self).get_queryset()
+        queryset = queryset.order_by('handle', '-create_time')
+        return queryset
+
+
+class HandleReportView(CheckSecurityMixin, CheckAdminPermissionMixin,
+                       StatusWrapMixin, JsonResponseMixin, DetailView):
+    http_method_names = ['get']
+    model = Report
+
+    def get(self, request, *args, **kwargs):
+        rid = kwargs.get('rid')
+        if rid:
+            report = Report.objects.filter(id=rid)
+            if report.exists():
+                report = report[0]
+                report.handle = True
+                report.save()
+                return self.render_to_response({})
+        self.message = '举报不存在'
+        self.status_code = INFO_NO_EXIST
+        return self.render_to_response({})

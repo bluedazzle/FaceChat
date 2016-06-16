@@ -223,6 +223,10 @@ class UserResetView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMixin, Upda
         if not self.object:
             return self.render_to_response(dict())
         super(UserResetView, self).form_valid(form)
+        if self.object.forbid:
+            self.message = '账号已禁止'
+            self.status_code = ERROR_PERMISSION_DENIED
+            return self.render_to_response({})
         self.token = self.create_token()
         self.object.token = self.token
         self.object.set_password(form.cleaned_data.get('password'))
@@ -273,6 +277,10 @@ class UserLoginView(CheckSecurityMixin, StatusWrapMixin, JsonResponseMixin, Upda
         if not self.object:
             return self.render_to_response(dict())
         super(UserLoginView, self).form_valid(form)
+        if self.object.forbid:
+            self.message = '账号已禁止'
+            self.status_code = ERROR_PERMISSION_DENIED
+            return self.render_to_response({})
         if not self.object.check_password(form.cleaned_data.get('password')):
             self.message = '密码不正确'
             self.status_code = ERROR_PASSWORD
@@ -396,8 +404,12 @@ class UserThirdLoginView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, J
         if openid:
             user = FaceUser.objects.filter(Q(weibo_openid=openid) | Q(wechat_openid=openid) | Q(qq_openid=openid))
             if user.exists():
-                token = self.create_token()
                 user = user[0]
+                if user.forbid:
+                    self.message = '账号已禁止'
+                    self.status_code = ERROR_PERMISSION_DENIED
+                    return self.render_to_response({})
+                token = self.create_token()
                 user.token = token
                 user.save()
                 return self.render_to_response(user)

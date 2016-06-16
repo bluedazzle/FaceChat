@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>举报</title>
+</head>
+<body>
+
+</body>
+</html>a{% extends 'admin/admin_base.html' %}
+{% block content %}
+    <div class="boloContainer" id="vReport">
+        <div class="ui breadcrumb">
+            <a class="section">举报</a>
+            <i class="right angle icon divider"></i>
+        </div>
+        <div class="ui divider"></div>
+        <table class="ui celled selectable table">
+            <thead>
+            <tr>
+                <th>举报时间</th>
+                <th>举报人</th>
+                <th>被举报人</th>
+                <th>举报类型</th>
+                <th>详情</th>
+                <th>附言</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div v-show="noData" class="ui active inverted dimmer">
+                <div class="ui text loader">Loading</div>
+            </div>
+            <tr v-for="(index, report) in reports">
+                 <td>${ report.create_time }}</td>
+                <td>
+                    <h4 class="ui image header">
+                        <img src="${ report.reporter.avatar }}" class="ui mini rounded image">
+                        <div class="content">${ report.reporter.nick }}
+                            <div class="sub header">
+                                <span>${ report.reporter.phone }}</span>
+                                <span>&nbsp;</span>
+                            </div>
+                        </div>
+                    </h4>
+                </td>
+               <td>
+                    <h4 class="ui image header">
+                        <img src="${ report.reported.avatar }}" class="ui mini rounded image">
+                        <div class="content">${ report.reported.nick }}
+                            <div class="sub header">
+                                <span>${ report.reported.phone }}</span>
+                                <span>&nbsp;</span>
+                            </div>
+                        </div>
+                    </h4>
+                </td>
+                <td v-if="report.report_type != 3">
+                    ${ report.report_type == 1 ? '语言不当' : '行为不当' }}
+                </td>
+                <td v-else>
+                    其他
+                </td>
+                <td>
+                    <a href="${ report.image }}" target="_blank">图片</a>
+                </td>
+                <td>
+                    ${ report.remark }}
+                </td>
+                <td v-show="!report.handle">
+                    <button v-show="!report.reported.forbid"  class="ui small red button" @click="forbidUser(report.reported.id)">禁止</button>
+                    <button v-else class="ui small green button" @click="forbidUser(report.reported.id)">恢复</button>
+                    <button  class="ui small green button" @click="handleReport(report.id)">处理</button>
+                </td>
+                <td v-else>
+
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="7">
+                    <div class="ui action left icon input">
+                        <i class="search icon"></i>
+                        <input type="text" v-model="query" placeholder="搜索用户...">
+                        <button class="ui green button" @click="getData(null, 1)">搜索</button>
+                    </div>
+                    <div class="ui right floated pagination menu">
+                        <a class="icon item" :class="{'disabled': pageObj.previous == undefined}"
+                           @click="getData($event, pageObj.previous)">
+                            <i class="left chevron icon"></i>
+                        </a>
+                        <a class="item" v-for="page in pageObj.page_range"
+                           :class="{'active': page.page == pageObj.current}" @click="getData($event, page.page)">${
+                            page.page }}
+                            <a class="icon item" :class="{'disabled': pageObj.next == undefined}"
+                               @click="getData($event, pageObj.next)">
+                                <i class="right chevron icon"></i>
+                            </a>
+                    </div>
+                </th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="/s/js/src/report.js"></script>
+    <script>
+        function deletePlayer(id) {
+            mid = '#delModal' + id.toString();
+            $(mid)
+                    .modal('setting', 'closable', false)
+                    .modal('show');
+        }
+        function addPlayer() {
+            $('#addModal')
+                    .modal('setting', 'closable', false)
+                    .modal('setting', 'transition', 'horizontal flip')
+                    .modal('show');
+        }
+    </script>
+{% endblock %}

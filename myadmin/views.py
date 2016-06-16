@@ -62,3 +62,8 @@ class PeepView(CheckAdminPagePermissionMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         return render_to_response('admin/interface_Waiting.html')
+
+
+class ReportView(CheckAdminPagePermissionMixin, TemplateView):
+    template_name = 'admin/admin_report.html'
+    http_method_names = ['get']

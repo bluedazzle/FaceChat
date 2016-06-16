@@ -11,4 +11,8 @@ urlpatterns = patterns('',
                        url(r'^users', AdminUserListView.as_view()),
                        # url(r'^player/(?P<pid>(\d)+)', AdminPlayerDetailView.as_view()),
                        url(r'^chat', AdminChatHistoryView.as_view()),
+                       url(r'^report/(?P<rid>(\d)+)', HandleReportView.as_view()),
+                       url(r'^reports', ReportListView.as_view()),
+
+
                        )

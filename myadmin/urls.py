@@ -9,4 +9,5 @@ urlpatterns = patterns('',
                        url(r'^logout', AdminLogoutView.as_view()),
                        url(r'^users', AdminUserListView.as_view()),
                        url(r'^peep', PeepView.as_view()),
+                       url(r'^reports', ReportView.as_view()),
                        )
