@@ -22,4 +22,5 @@ urlpatterns = patterns('',
                        url(r'^open', OpenTimeView.as_view()),
                        url(r'^number', MatchNumberView.as_view()),
                        url(r'^modify', ModifyInfoView.as_view()),
+                       url(r'^report', UserFeedBackView.as_view()),
                        )

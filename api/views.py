@@ -635,19 +635,25 @@ class PortocolView(TemplateView):
     http_method_names = ['get']
     template_name = 'protocol.html'
 
-# class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
-#     http_method_names = ['post']
-#     model = FeedBack
-#
-#     def post(self, request, *args, **kwargs):
-#         if not self.wrap_check_sign_result():
-#             return self.render_to_response(dict())
-#         if not self.wrap_check_token_result():
-#             return self.render_to_response(dict())
-#         content = request.POST.get('content')
-#         if content and content != '':
-#             FeedBack(content=content, author=self.user).save()
-#             return self.render_to_response(dict())
-#         self.message = '请填写反馈内容'
-#         self.status_code = ERROR_DATA
-#         return self.render_to_response(dict())
+
+class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
+    http_method_names = ['post']
+    model = Report
+
+    def post(self, request, *args, **kwargs):
+        if not self.wrap_check_sign_result():
+            return self.render_to_response(dict())
+        if not self.wrap_check_token_result():
+            return self.render_to_response(dict())
+        content = request.POST.get('content', '')
+        fid = request.POST.get('id')
+        report_type = int(request.POST.get('type', 1))
+        image = request.POST.get('image', '')
+        reported = FaceUser.objects.filter(id=fid)
+        if reported.exists():
+            reported = reported[0]
+            Report(remark=content, reporter=self.user, reported=reported, report_type=report_type, image=image).save()
+            return self.render_to_response(dict())
+        self.message = '被举报人不存在'
+        self.status_code = ERROR_DATA
+        return self.render_to_response(dict())

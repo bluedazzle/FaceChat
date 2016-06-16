@@ -97,3 +97,21 @@ class Secret(BaseModel):
 
     def __unicode__(self):
         return self.info
+
+
+class Report(BaseModel):
+    report_choice = [
+        (1, '不当言语'),
+        (2, '不当行为'),
+        (3, '其他')
+    ]
+
+    reporter = models.ForeignKey(FaceUser, related_name='user_reports')
+    reported = models.ForeignKey(FaceUser, related_name='user_reported')
+    remark = models.CharField(max_length=512, default='')
+    handle = models.BooleanField(default=False)
+    report_type = models.IntegerField(default=1, choices=report_choice)
+    image = models.CharField(max_length=256, default='')
+
+    def __unicode__(self):
+        return self.reporter.nick
