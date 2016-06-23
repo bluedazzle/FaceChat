@@ -35,6 +35,7 @@ class FaceUser(BaseModel, AbstractBaseUser):
     qq_bind = models.BooleanField(default=False)
 
     token = models.CharField(max_length=64, unique=True)
+    block_list = models.ManyToManyField('self', related_name='blocked_by')
 
     USERNAME_FIELD = 'phone'
 

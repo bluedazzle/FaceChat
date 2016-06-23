@@ -23,4 +23,5 @@ urlpatterns = patterns('',
                        url(r'^number', MatchNumberView.as_view()),
                        url(r'^modify', ModifyInfoView.as_view()),
                        url(r'^report', UserFeedBackView.as_view()),
+                       url(r'^block', BlockView.as_view()),
                        )

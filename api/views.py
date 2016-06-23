@@ -475,8 +475,9 @@ class MatchView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonRespon
         if wish != 2:
             match_list = match_list.filter(sex=wish)
         match_list = match_list.filter(Q(wish=self.user.sex) | Q(wish=2))
-        if match_list.exists():
-            index = random.randint(0, (match_list.count() - 1))
+        match_list = self.block_filter(match_list)
+        if match_list:
+            index = random.randint(0, (len(match_list) - 1))
             match = match_list[index]
             chat = ChatHistory.objects.filter(creater_uuid=match.uuid, chat=True)
             matcher = {'nick': match.user.nick,
@@ -521,6 +522,13 @@ class MatchView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonRespon
 
     def create_uuid(self, sign='C'):
         return '{0}{1}{2}'.format(sign, unicode(time.time()).replace('.', '')[:12], random.randint(100000, 999999))
+
+    def block_filter(self, match_list):
+        filter_list = []
+        for match in match_list:
+            if match not in self.user.block_list.all():
+                filter_list.append(match)
+        return filter_list
 
 
 class CheckMatchView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
@@ -669,3 +677,23 @@ class UserFeedBackView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, Jso
         self.message = '被举报人不存在'
         self.status_code = ERROR_DATA
         return self.render_to_response(dict())
+
+
+class BlockView(CheckSecurityMixin, CheckTokenMixin, StatusWrapMixin, JsonResponseMixin, DetailView):
+    http_method_names = ['get']
+
+    def get(self, request, *args, **kwargs):
+        if not self.wrap_check_sign_result():
+            return self.render_to_response(dict())
+        if not self.wrap_check_token_result():
+            return self.render_to_response(dict())
+        fid = request.GET.get('fid')
+        blocked = FaceUser.objects.filter(id=fid)
+        if blocked:
+            blocked = blocked[0]
+            if blocked not in self.user.block_list.all():
+                self.user.block_list.add(blocked)
+            return self.render_to_response({})
+        self.message = '用户不存在'
+        self.status_code = INFO_NO_EXIST
+        return self.render_to_response({})
